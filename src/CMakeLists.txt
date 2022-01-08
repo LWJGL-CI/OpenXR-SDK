@@ -216,7 +216,7 @@ cmake_dependent_option(
 if(WIN32)
     add_definitions(-DXR_OS_WINDOWS)
     add_definitions(-DNOMINMAX)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     add_definitions(-DXR_OS_LINUX)
 elseif(ANDROID)
     add_definitions(-DXR_OS_ANDROID)
