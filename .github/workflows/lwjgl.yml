@@ -1,0 +1,250 @@
+name: LWJGL Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  S3_PARAMS: --cache-control "public,must-revalidate,proxy-revalidate,max-age=0"
+  OPENXR_PARAMS: -DDYNAMIC_LOADER=ON -DBUILD_WITH_STD_FILESYSTEM=OFF
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    container:
+      image: almalinux:8
+    strategy:
+      fail-fast: false
+      matrix:
+        ARCH: [ x64 ]
+        include:
+          - ARCH: x64
+            PACKAGES: alsa-lib-devel pulseaudio-libs-devel portaudio-devel jack-audio-connection-kit-devel dbus-devel pipewire-devel
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Install git
+        run: dnf -y install git
+      - name: Clone repository
+        run: git clone --depth 3 https://github.com/${{ github.repository }}.git .
+      - name: Install build dependencies
+        run: |
+          dnf -y install epel-release wget
+          wget https://pkgs.sysadmins.ws/el8/base/x86_64/raven-release-1.0.1-1.el8.noarch.rpm
+          rpm -ivh raven-release-1.0.1-1.el8.noarch.rpm
+          dnf config-manager --set-enabled powertools
+          dnf config-manager --set-enabled raven-extras
+          dnf -y update
+          dnf -y install gcc-toolset-15-gcc gcc-toolset-15-gcc-c++ cmake awscli
+      - name: Install OpenXR-SDK dependencies
+        run: |
+          dnf -y install \
+            libX11-devel \
+            libxcb-devel \
+            wayland-devel \
+            mesa-libGL-devel \
+            vulkan-devel
+      - name: Configure build
+        run: |
+          source /opt/rh/gcc-toolset-15/enable || true
+          cmake -B build $OPENXR_PARAMS -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: |
+          source /opt/rh/gcc-toolset-15/enable || true
+          cmake --build build --parallel
+          strip build/src/loader/libopenxr_loader.so
+      - name: Upload artifact
+        run: aws s3 cp build/src/loader/libopenxr_loader.so s3://lwjgl-build/nightly/linux/${{matrix.ARCH}}/ ${{env.S3_PARAMS}}
+      - name: Upload git revision
+        run: |
+          git config --global --add safe.directory $PWD
+          git log --first-parent --pretty=format:%H HEAD~2..HEAD~1 > libopenxr_loader.so.git
+          aws s3 cp libopenxr_loader.so.git s3://lwjgl-build/nightly/linux/${{matrix.ARCH}}/ ${{env.S3_PARAMS}}
+
+  linux-cross:
+    name: Linux Cross
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ARCH: [arm32, arm64, ppc64le, riscv64]
+        include:
+          - ARCH: arm32
+            CROSS_ARCH: armhf
+            TRIPLET: arm-linux-gnueabihf
+          - ARCH: arm64
+            CROSS_ARCH: arm64
+            TRIPLET: aarch64-linux-gnu
+          - ARCH: ppc64le
+            CROSS_ARCH: ppc64el
+            TRIPLET: powerpc64le-linux-gnu
+          - ARCH: riscv64
+            CROSS_ARCH: riscv64
+            TRIPLET: riscv64-linux-gnu
+    env:
+      LWJGL_ARCH: ${{matrix.ARCH}}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 3
+      - name: Install dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -yq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -yq install awscli cmake \
+            gcc-12-${{matrix.TRIPLET}} \
+            g++-12-${{matrix.TRIPLET}} \
+            libc6-dev-${{matrix.CROSS_ARCH}}-cross
+      - name: Prepare cross-compilation for ${{matrix.CROSS_ARCH}}
+        run: |
+          sudo grep 'deb ' /etc/apt/sources.list | sudo tee /etc/apt/sources.list.d/ports.list
+          sudo sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
+          sudo sed -i 's#^deb [^ ]\+#deb [arch=${{matrix.CROSS_ARCH}}] https://ports.ubuntu.com/ubuntu-ports/#' /etc/apt/sources.list.d/ports.list
+          sudo dpkg --add-architecture ${{matrix.CROSS_ARCH}}
+          sudo apt-get update || true
+      - name: Install cross-compilation dependencies
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -yq install \
+            libgl1-mesa-dev:${{matrix.CROSS_ARCH}} \
+            libvulkan-dev:${{matrix.CROSS_ARCH}} \
+            libx11-xcb-dev:${{matrix.CROSS_ARCH}} \
+            libxcb-dri2-0-dev:${{matrix.CROSS_ARCH}} \
+            libxcb-glx0-dev:${{matrix.CROSS_ARCH}} \
+            libxcb-icccm4-dev:${{matrix.CROSS_ARCH}} \
+            libxcb-keysyms1-dev:${{matrix.CROSS_ARCH}} \
+            libxcb-randr0-dev:${{matrix.CROSS_ARCH}} \
+            libxrandr-dev:${{matrix.CROSS_ARCH}} \
+            libxxf86vm-dev:${{matrix.CROSS_ARCH}} \
+            mesa-common-dev:${{matrix.CROSS_ARCH}} \
+            libwayland-dev:${{matrix.CROSS_ARCH}}
+      - name: Configure build
+        run: |
+          export PKG_CONFIG_LIBDIR="/usr/lib/${{matrix.TRIPLET}}/pkgconfig:/usr/share/pkgconfig"
+          CC=${{matrix.TRIPLET}}-gcc-12 CXX=${{matrix.TRIPLET}}-g++-12 cmake -B build $OPENXR_PARAMS -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: |
+          cmake --build build --parallel
+          ${{matrix.TRIPLET}}-strip build/src/loader/libopenxr_loader.so
+      - name: Upload artifact
+        run: aws s3 cp build/src/loader/libopenxr_loader.so s3://lwjgl-build/nightly/linux/${{matrix.ARCH}}/ ${{env.S3_PARAMS}}
+      - name: Upload git revision
+        run: |
+          git config --global --add safe.directory $(pwd)
+          git log --first-parent --pretty=format:%H HEAD~2..HEAD~1 > libopenxr_loader.so.git
+          aws s3 cp libopenxr_loader.so.git s3://lwjgl-build/nightly/linux/${{matrix.ARCH}}/ ${{env.S3_PARAMS}}
+
+  freebsd-cross:
+    name: FreeBSD Cross
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 3
+      - name: Build
+        uses: cross-platform-actions/action@v0.32.0
+        with:
+          operating_system: freebsd
+          architecture: x86-64
+          version: '13.5'
+          memory: 4G
+          shell: bash
+          environment_variables: OPENXR_PARAMS
+          run: |
+            sudo pkg install -y cmake libX11 libxcb wayland mesa-libs vulkan-headers
+            cmake -B build $OPENXR_PARAMS -DCMAKE_BUILD_TYPE=Release
+            cmake --build build --parallel 4
+            strip build/src/loader/libopenxr_loader.so
+      - name: Upload artifact # Symlinks are not copied out of the VM. These SOs are versioned.
+        run: aws s3 cp `ls build/src/loader/libopenxr_loader.so*` s3://lwjgl-build/nightly/freebsd/x64/libopenxr_loader.so ${{env.S3_PARAMS}}
+      - name: Upload git revision
+        run: |
+          git config --global --add safe.directory $PWD
+          git log --first-parent --pretty=format:%H HEAD~2..HEAD~1 > libopenxr_loader.so.git
+          aws s3 cp libopenxr_loader.so.git s3://lwjgl-build/nightly/freebsd/x64/ ${{env.S3_PARAMS}}
+
+  macos:
+    name: macOS
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ARCH: [x64, arm64]
+        include:
+          - ARCH: x64
+            CMAKE_PARAMS: -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DCMAKE_OSX_ARCHITECTURES=x86_64
+          - ARCH: arm64
+            CMAKE_PARAMS: -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DCMAKE_OSX_ARCHITECTURES=arm64
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 3
+      - name: Configure build
+        run: cmake -B build $OPENXR_PARAMS
+      - name: Build
+        run: |
+          cmake --build build
+          strip -u -r build/src/loader/libopenxr_loader.dylib
+      - name: Upload artifacts
+        run: aws s3 cp build/src/loader/libopenxr_loader.dylib s3://lwjgl-build/nightly/macosx/${{matrix.ARCH}}/ ${{env.S3_PARAMS}}
+      - name: Upload git revision
+        run: |
+          git log --first-parent --pretty=format:%H HEAD~2..HEAD~1 > libopenxr_loader.dylib.git
+          aws s3 cp libopenxr_loader.dylib.git s3://lwjgl-build/nightly/macosx/${{matrix.ARCH}}/ ${{env.S3_PARAMS}}
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ARCH: [x86, x64, arm64]
+        include:
+          - ARCH: x86
+            PLATFORM: Win32
+            #VCTOOLS: x86.x64
+          - ARCH: x64
+            PLATFORM: x64
+            #VCTOOLS: x86.x64
+          - ARCH: arm64
+            PLATFORM: ARM64
+            #VCTOOLS: ARM64
+    defaults:
+      run:
+        shell: cmd
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 3
+#      - name: Install Visual Studio 2026 Build Tools
+#        shell: pwsh
+#        run: |
+#          choco install cmake
+#          choco install visualstudio2026buildtools --package-parameters "`
+#            --add Microsoft.VisualStudio.Workload.VCTools `
+#            --add Microsoft.VisualStudio.Component.VC.Tools.${{matrix.VCTOOLS}} `
+#            --includeRecommended `
+#            --quiet" `
+#            -y `
+#            --ignore-package-exit-codes=3010
+      - name: Configure build
+        #-T ClangCL
+        run: cmake -B build -G "Visual Studio 17 2022" -A ${{matrix.PLATFORM}} %OPENXR_PARAMS%
+      - name: Build
+        run: cmake --build build --parallel --config Release --parallel
+      - name: Upload artifact
+        run: aws s3 cp build\src\loader\Release\openxr_loader.dll s3://lwjgl-build/nightly/windows/${{matrix.ARCH}}/openxr-loader.dll ${{env.S3_PARAMS}}
+      - name: Upload git revision
+        run: |
+          git log --first-parent --pretty=format:%%H HEAD~2..HEAD~1 > revision.git
+          aws s3 cp revision.git s3://lwjgl-build/nightly/windows/${{matrix.ARCH}}/openxr-loader.dll.git ${{env.S3_PARAMS}}
