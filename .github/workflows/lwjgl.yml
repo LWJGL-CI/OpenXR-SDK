@@ -66,15 +66,16 @@ jobs:
     name: Linux Cross
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:18.04
+      image: ${{matrix.CONTAINER}}
     strategy:
       fail-fast: false
       matrix:
-        BUILD: [arm32, arm64]
+        BUILD: [arm32, arm64, riscv64]
         include:
           - BUILD: arm32
             ARCH: arm32
             CROSS_ARCH: armhf
+            CONTAINER: ubuntu:18.04
             PACKAGES: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-armhf-cross
             CROSS_PACKAGES: libgl1-mesa-dev:armhf libvulkan-dev:armhf libx11-xcb-dev:armhf libxcb-dri2-0-dev:armhf libxcb-glx0-dev:armhf libxcb-icccm4-dev:armhf libxcb-keysyms1-dev:armhf libxcb-randr0-dev:armhf libxrandr-dev:armhf libxxf86vm-dev:armhf mesa-common-dev:armhf libwayland-dev:armhf
             CC: PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_SYSROOT}/usr/lib/arm-linux-gnueabihf/pkgconfig CC=arm-linux-gnueabihf-gcc CXX=arm-linux-gnueabihf-g++
@@ -82,10 +83,19 @@ jobs:
           - BUILD: arm64
             ARCH: arm64
             CROSS_ARCH: arm64
+            CONTAINER: ubuntu:18.04
             PACKAGES: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu libc6-dev-arm64-cross
             CROSS_PACKAGES: libgl1-mesa-dev:arm64 libvulkan-dev:arm64 libx11-xcb-dev:arm64 libxcb-dri2-0-dev:arm64 libxcb-glx0-dev:arm64 libxcb-icccm4-dev:arm64 libxcb-keysyms1-dev:arm64 libxcb-randr0-dev:arm64 libxrandr-dev:arm64 libxxf86vm-dev:arm64 mesa-common-dev:arm64 libwayland-dev:arm64
             CC: PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu/pkgconfig CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
             STRIP: aarch64-linux-gnu-strip
+          - BUILD: riscv64
+            ARCH: riscv64
+            CROSS_ARCH: riscv64
+            CONTAINER: ubuntu:20.04
+            PACKAGES: gcc-riscv64-linux-gnu g++-riscv64-linux-gnu libc6-dev-riscv64-cross
+            CROSS_PACKAGES: libgl1-mesa-dev:riscv64 libvulkan-dev:riscv64 libx11-xcb-dev:riscv64 libxcb-dri2-0-dev:riscv64 libxcb-glx0-dev:riscv64 libxcb-icccm4-dev:riscv64 libxcb-keysyms1-dev:riscv64 libxcb-randr0-dev:riscv64 libxrandr-dev:riscv64 libxxf86vm-dev:riscv64 mesa-common-dev:riscv64 libwayland-dev:riscv64
+            CC: PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${CMAKE_SYSROOT}/usr/lib/riscv64-linux-gnu/pkgconfig CC=riscv64-linux-gnu-gcc CXX=riscv64-linux-gnu-g++
+            STRIP: riscv64-linux-gnu-strip
     env:
       LWJGL_ARCH: ${{matrix.ARCH}}
     steps:
@@ -99,6 +109,9 @@ jobs:
           apt-key add kitware-archive-latest.asc
           add-apt-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main'
           add-apt-repository -y ppa:git-core/ppa
+        name: Update apt repositories
+        if: ${{ matrix.CONTAINER == 'ubuntu:18.04' }}
+      - run: |
           apt-get -y update
           DEBIAN_FRONTEND=noninteractive apt-get -yq install awscli git
         name: Upgrade git
@@ -110,7 +123,7 @@ jobs:
       - run: |
           sed -i 's/deb http/deb [arch=amd64,i386] http/' /etc/apt/sources.list
           grep "ubuntu.com/ubuntu" /etc/apt/sources.list | tee /etc/apt/sources.list.d/ports.list
-          sed -i 's/amd64,i386/armhf,arm64/' /etc/apt/sources.list.d/ports.list
+          sed -i 's/amd64,i386/${{matrix.CROSS_ARCH}}/' /etc/apt/sources.list.d/ports.list
           sed -i 's#http://.*/ubuntu#http://ports.ubuntu.com/ubuntu-ports#' /etc/apt/sources.list.d/ports.list
           dpkg --add-architecture ${{matrix.CROSS_ARCH}}
           apt-get update
