@@ -188,6 +188,7 @@ XR_ENUM_STR(XrResult);
     _(XR_COLOCATION_DISCOVERY_ALREADY_DISCOVERING_META, 1000571004) \
     _(XR_ERROR_SPACE_GROUP_NOT_FOUND_META, -1000572002) \
     _(XR_ERROR_ANCHOR_NOT_OWNED_BY_CALLER_ANDROID, -1000701000) \
+    _(XR_ERROR_IMAGE_FORMAT_UNSUPPORTED_ANDROID, -1000709000) \
     _(XR_ERROR_SPATIAL_CAPABILITY_UNSUPPORTED_EXT, -1000740001) \
     _(XR_ERROR_SPATIAL_ENTITY_ID_INVALID_EXT, -1000740002) \
     _(XR_ERROR_SPATIAL_BUFFER_ID_INVALID_EXT, -1000740003) \
@@ -722,6 +723,13 @@ XR_ENUM_STR(XrResult);
     _(XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_ANDROID, 1000707000) \
     _(XR_TYPE_TRACKABLE_MARKER_CONFIGURATION_ANDROID, 1000707001) \
     _(XR_TYPE_TRACKABLE_MARKER_ANDROID, 1000707002) \
+    _(XR_TYPE_SYSTEM_IMAGE_TRACKING_PROPERTIES_ANDROID, 1000709000) \
+    _(XR_TYPE_TRACKABLE_IMAGE_DATABASE_ENTRY_ANDROID, 1000709001) \
+    _(XR_TYPE_TRACKABLE_IMAGE_DATABASE_CREATE_INFO_ANDROID, 1000709002) \
+    _(XR_TYPE_CREATE_TRACKABLE_IMAGE_DATABASE_COMPLETION_ANDROID, 1000709003) \
+    _(XR_TYPE_TRACKABLE_IMAGE_CONFIGURATION_ANDROID, 1000709004) \
+    _(XR_TYPE_TRACKABLE_IMAGE_ANDROID, 1000709005) \
+    _(XR_TYPE_EVENT_DATA_IMAGE_TRACKING_LOST_ANDROID, 1000709006) \
     _(XR_TYPE_SPATIAL_CAPABILITY_COMPONENT_TYPES_EXT, 1000740000) \
     _(XR_TYPE_SPATIAL_CONTEXT_CREATE_INFO_EXT, 1000740001) \
     _(XR_TYPE_CREATE_SPATIAL_CONTEXT_COMPLETION_EXT, 1000740002) \
@@ -868,6 +876,7 @@ XR_ENUM_STR(XrResult);
     _(XR_OBJECT_TYPE_FACE_TRACKER_ANDROID, 1000458000) \
     _(XR_OBJECT_TYPE_WORLD_MESH_DETECTOR_ML, 1000474000) \
     _(XR_OBJECT_TYPE_FACIAL_EXPRESSION_CLIENT_ML, 1000482000) \
+    _(XR_OBJECT_TYPE_TRACKABLE_IMAGE_DATABASE_ANDROID, 1000709000) \
     _(XR_OBJECT_TYPE_SPATIAL_ENTITY_EXT, 1000740000) \
     _(XR_OBJECT_TYPE_SPATIAL_CONTEXT_EXT, 1000740001) \
     _(XR_OBJECT_TYPE_SPATIAL_SNAPSHOT_EXT, 1000740002) \
@@ -2019,6 +2028,7 @@ XR_ENUM_STR(XrResult);
     _(XR_TRACKABLE_TYPE_DEPTH_ANDROID, 1000463000) \
     _(XR_TRACKABLE_TYPE_OBJECT_ANDROID, 1000466000) \
     _(XR_TRACKABLE_TYPE_MARKER_ANDROID, 1000707000) \
+    _(XR_TRACKABLE_TYPE_IMAGE_ANDROID, 1000709000) \
     _(XR_TRACKABLE_TYPE_MAX_ENUM_ANDROID, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrPlaneTypeANDROID(_) \
@@ -2254,6 +2264,15 @@ XR_ENUM_STR(XrResult);
     _(XR_TRACKABLE_MARKER_DICTIONARY_APRILTAG_36H10_ANDROID, 18) \
     _(XR_TRACKABLE_MARKER_DICTIONARY_APRILTAG_36H11_ANDROID, 19) \
     _(XR_TRACKABLE_MARKER_DICTIONARY_MAX_ENUM_ANDROID, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrTrackableImageTrackingModeANDROID(_) \
+    _(XR_TRACKABLE_IMAGE_TRACKING_MODE_DYNAMIC_ANDROID, 1) \
+    _(XR_TRACKABLE_IMAGE_TRACKING_MODE_STATIC_ANDROID, 2) \
+    _(XR_TRACKABLE_IMAGE_TRACKING_MODE_MAX_ENUM_ANDROID, 0x7FFFFFFF)
+
+#define XR_LIST_ENUM_XrTrackableImageFormatANDROID(_) \
+    _(XR_TRACKABLE_IMAGE_FORMAT_R8G8B8A8_ANDROID, 1) \
+    _(XR_TRACKABLE_IMAGE_FORMAT_MAX_ENUM_ANDROID, 0x7FFFFFFF)
 
 #define XR_LIST_ENUM_XrSpatialCapabilityEXT(_) \
     _(XR_SPATIAL_CAPABILITY_PLANE_TRACKING_EXT, 1000741000) \
@@ -6955,6 +6974,65 @@ XR_ENUM_STR(XrResult);
     _(centerPose) \
     _(extents) \
 
+/// Calls your macro with the name of each member of XrSystemImageTrackingPropertiesANDROID, in order.
+#define XR_LIST_STRUCT_XrSystemImageTrackingPropertiesANDROID(_) \
+    _(type) \
+    _(next) \
+    _(supportsImageTracking) \
+    _(supportsPhysicalSizeEstimation) \
+    _(maxTrackedImageCount) \
+    _(maxLoadedImageCount) \
+
+/// Calls your macro with the name of each member of XrTrackableImageDatabaseEntryANDROID, in order.
+#define XR_LIST_STRUCT_XrTrackableImageDatabaseEntryANDROID(_) \
+    _(type) \
+    _(next) \
+    _(trackingMode) \
+    _(physicalWidth) \
+    _(imageWidth) \
+    _(imageHeight) \
+    _(format) \
+    _(bufferSize) \
+    _(buffer) \
+
+/// Calls your macro with the name of each member of XrTrackableImageDatabaseCreateInfoANDROID, in order.
+#define XR_LIST_STRUCT_XrTrackableImageDatabaseCreateInfoANDROID(_) \
+    _(type) \
+    _(next) \
+    _(entryCount) \
+    _(entries) \
+
+/// Calls your macro with the name of each member of XrCreateTrackableImageDatabaseCompletionANDROID, in order.
+#define XR_LIST_STRUCT_XrCreateTrackableImageDatabaseCompletionANDROID(_) \
+    _(type) \
+    _(next) \
+    _(futureResult) \
+    _(database) \
+
+/// Calls your macro with the name of each member of XrTrackableImageConfigurationANDROID, in order.
+#define XR_LIST_STRUCT_XrTrackableImageConfigurationANDROID(_) \
+    _(type) \
+    _(next) \
+    _(databaseCount) \
+    _(databases) \
+
+/// Calls your macro with the name of each member of XrTrackableImageANDROID, in order.
+#define XR_LIST_STRUCT_XrTrackableImageANDROID(_) \
+    _(type) \
+    _(next) \
+    _(trackingState) \
+    _(lastUpdatedTime) \
+    _(database) \
+    _(databaseEntryIndex) \
+    _(centerPose) \
+    _(extents) \
+
+/// Calls your macro with the name of each member of XrEventDataImageTrackingLostANDROID, in order.
+#define XR_LIST_STRUCT_XrEventDataImageTrackingLostANDROID(_) \
+    _(type) \
+    _(next) \
+    _(time) \
+
 /// Calls your macro with the name of each member of XrSpatialCapabilityComponentTypesEXT, in order.
 #define XR_LIST_STRUCT_XrSpatialCapabilityComponentTypesEXT(_) \
     _(type) \
@@ -7814,6 +7892,13 @@ XR_ENUM_STR(XrResult);
     _(XrSystemMarkerTrackingPropertiesANDROID, XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_ANDROID) \
     _(XrTrackableMarkerConfigurationANDROID, XR_TYPE_TRACKABLE_MARKER_CONFIGURATION_ANDROID) \
     _(XrTrackableMarkerANDROID, XR_TYPE_TRACKABLE_MARKER_ANDROID) \
+    _(XrSystemImageTrackingPropertiesANDROID, XR_TYPE_SYSTEM_IMAGE_TRACKING_PROPERTIES_ANDROID) \
+    _(XrTrackableImageDatabaseEntryANDROID, XR_TYPE_TRACKABLE_IMAGE_DATABASE_ENTRY_ANDROID) \
+    _(XrTrackableImageDatabaseCreateInfoANDROID, XR_TYPE_TRACKABLE_IMAGE_DATABASE_CREATE_INFO_ANDROID) \
+    _(XrCreateTrackableImageDatabaseCompletionANDROID, XR_TYPE_CREATE_TRACKABLE_IMAGE_DATABASE_COMPLETION_ANDROID) \
+    _(XrTrackableImageConfigurationANDROID, XR_TYPE_TRACKABLE_IMAGE_CONFIGURATION_ANDROID) \
+    _(XrTrackableImageANDROID, XR_TYPE_TRACKABLE_IMAGE_ANDROID) \
+    _(XrEventDataImageTrackingLostANDROID, XR_TYPE_EVENT_DATA_IMAGE_TRACKING_LOST_ANDROID) \
     _(XrSpatialCapabilityComponentTypesEXT, XR_TYPE_SPATIAL_CAPABILITY_COMPONENT_TYPES_EXT) \
     _(XrSpatialContextCreateInfoEXT, XR_TYPE_SPATIAL_CONTEXT_CREATE_INFO_EXT) \
     _(XrCreateSpatialContextCompletionEXT, XR_TYPE_CREATE_SPATIAL_CONTEXT_COMPLETION_EXT) \
@@ -8233,6 +8318,7 @@ XR_ENUM_STR(XrResult);
     _(XR_META_spatial_entity_group_sharing, 573) \
     _(XR_ANDROID_anchor_sharing_export, 702) \
     _(XR_ANDROID_trackables_marker, 708) \
+    _(XR_ANDROID_trackables_image, 710) \
     _(XR_KHR_maintenance1, 711) \
     _(XR_KHR_generic_controller, 712) \
     _(XR_EXT_spatial_entity, 741) \
@@ -9435,6 +9521,19 @@ XR_ENUM_STR(XrResult);
 /// because it is easy to add back but impossible to remove with the preprocessor.
 #define XR_LIST_FUNCTIONS_XR_ANDROID_trackables_marker(_) \
     _(GetTrackableMarkerANDROID, ANDROID_trackables_marker) \
+
+
+/// For every function defined by XR_ANDROID_trackables_image in this version of the spec,
+/// calls your macro with the function name and extension name.
+/// Trims the leading `xr` from the function name and the leading `XR_` from the feature name,
+/// because it is easy to add back but impossible to remove with the preprocessor.
+#define XR_LIST_FUNCTIONS_XR_ANDROID_trackables_image(_) \
+    _(CreateTrackableImageDatabaseAsyncANDROID, ANDROID_trackables_image) \
+    _(CreateTrackableImageDatabaseCompleteANDROID, ANDROID_trackables_image) \
+    _(DestroyTrackableImageDatabaseANDROID, ANDROID_trackables_image) \
+    _(AddTrackableImageDatabaseANDROID, ANDROID_trackables_image) \
+    _(RemoveTrackableImageDatabaseANDROID, ANDROID_trackables_image) \
+    _(GetTrackableImageANDROID, ANDROID_trackables_image) \
 
 
 /// For every function defined by XR_EXT_spatial_entity in this version of the spec,

@@ -714,6 +714,14 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     // ---- XR_ANDROID_trackables_marker extension commands
     (get_inst_proc_addr(instance, "xrGetTrackableMarkerANDROID", (PFN_xrVoidFunction*)&table->GetTrackableMarkerANDROID));
 
+    // ---- XR_ANDROID_trackables_image extension commands
+    (get_inst_proc_addr(instance, "xrCreateTrackableImageDatabaseAsyncANDROID", (PFN_xrVoidFunction*)&table->CreateTrackableImageDatabaseAsyncANDROID));
+    (get_inst_proc_addr(instance, "xrCreateTrackableImageDatabaseCompleteANDROID", (PFN_xrVoidFunction*)&table->CreateTrackableImageDatabaseCompleteANDROID));
+    (get_inst_proc_addr(instance, "xrDestroyTrackableImageDatabaseANDROID", (PFN_xrVoidFunction*)&table->DestroyTrackableImageDatabaseANDROID));
+    (get_inst_proc_addr(instance, "xrAddTrackableImageDatabaseANDROID", (PFN_xrVoidFunction*)&table->AddTrackableImageDatabaseANDROID));
+    (get_inst_proc_addr(instance, "xrRemoveTrackableImageDatabaseANDROID", (PFN_xrVoidFunction*)&table->RemoveTrackableImageDatabaseANDROID));
+    (get_inst_proc_addr(instance, "xrGetTrackableImageANDROID", (PFN_xrVoidFunction*)&table->GetTrackableImageANDROID));
+
     // ---- XR_EXT_spatial_entity extension commands
     (get_inst_proc_addr(instance, "xrEnumerateSpatialCapabilitiesEXT", (PFN_xrVoidFunction*)&table->EnumerateSpatialCapabilitiesEXT));
     (get_inst_proc_addr(instance, "xrEnumerateSpatialCapabilityComponentTypesEXT", (PFN_xrVoidFunction*)&table->EnumerateSpatialCapabilityComponentTypesEXT));

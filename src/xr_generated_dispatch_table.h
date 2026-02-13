@@ -720,6 +720,14 @@ struct XrGeneratedDispatchTable {
     // ---- XR_ANDROID_trackables_marker extension commands
     PFN_xrGetTrackableMarkerANDROID GetTrackableMarkerANDROID;
 
+    // ---- XR_ANDROID_trackables_image extension commands
+    PFN_xrCreateTrackableImageDatabaseAsyncANDROID CreateTrackableImageDatabaseAsyncANDROID;
+    PFN_xrCreateTrackableImageDatabaseCompleteANDROID CreateTrackableImageDatabaseCompleteANDROID;
+    PFN_xrDestroyTrackableImageDatabaseANDROID DestroyTrackableImageDatabaseANDROID;
+    PFN_xrAddTrackableImageDatabaseANDROID AddTrackableImageDatabaseANDROID;
+    PFN_xrRemoveTrackableImageDatabaseANDROID RemoveTrackableImageDatabaseANDROID;
+    PFN_xrGetTrackableImageANDROID GetTrackableImageANDROID;
+
     // ---- XR_EXT_spatial_entity extension commands
     PFN_xrEnumerateSpatialCapabilitiesEXT EnumerateSpatialCapabilitiesEXT;
     PFN_xrEnumerateSpatialCapabilityComponentTypesEXT EnumerateSpatialCapabilityComponentTypesEXT;

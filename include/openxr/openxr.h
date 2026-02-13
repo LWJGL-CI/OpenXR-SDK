@@ -26,7 +26,7 @@ extern "C" {
     ((((major) & 0xffffULL) << 48) | (((minor) & 0xffffULL) << 32) | ((patch) & 0xffffffffULL))
 
 // OpenXR current version number.
-#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 54)
+#define XR_CURRENT_API_VERSION XR_MAKE_VERSION(1, 1, 57)
 
 // OpenXR 1.0 version number
 #define XR_API_VERSION_1_0 XR_MAKE_VERSION(1, 0, XR_VERSION_PATCH(XR_CURRENT_API_VERSION))
@@ -302,6 +302,7 @@ typedef enum XrResult {
     XR_COLOCATION_DISCOVERY_ALREADY_DISCOVERING_META = 1000571004,
     XR_ERROR_SPACE_GROUP_NOT_FOUND_META = -1000572002,
     XR_ERROR_ANCHOR_NOT_OWNED_BY_CALLER_ANDROID = -1000701000,
+    XR_ERROR_IMAGE_FORMAT_UNSUPPORTED_ANDROID = -1000709000,
     XR_ERROR_SPATIAL_CAPABILITY_UNSUPPORTED_EXT = -1000740001,
     XR_ERROR_SPATIAL_ENTITY_ID_INVALID_EXT = -1000740002,
     XR_ERROR_SPATIAL_BUFFER_ID_INVALID_EXT = -1000740003,
@@ -839,6 +840,13 @@ typedef enum XrStructureType {
     XR_TYPE_SYSTEM_MARKER_TRACKING_PROPERTIES_ANDROID = 1000707000,
     XR_TYPE_TRACKABLE_MARKER_CONFIGURATION_ANDROID = 1000707001,
     XR_TYPE_TRACKABLE_MARKER_ANDROID = 1000707002,
+    XR_TYPE_SYSTEM_IMAGE_TRACKING_PROPERTIES_ANDROID = 1000709000,
+    XR_TYPE_TRACKABLE_IMAGE_DATABASE_ENTRY_ANDROID = 1000709001,
+    XR_TYPE_TRACKABLE_IMAGE_DATABASE_CREATE_INFO_ANDROID = 1000709002,
+    XR_TYPE_CREATE_TRACKABLE_IMAGE_DATABASE_COMPLETION_ANDROID = 1000709003,
+    XR_TYPE_TRACKABLE_IMAGE_CONFIGURATION_ANDROID = 1000709004,
+    XR_TYPE_TRACKABLE_IMAGE_ANDROID = 1000709005,
+    XR_TYPE_EVENT_DATA_IMAGE_TRACKING_LOST_ANDROID = 1000709006,
     XR_TYPE_SPATIAL_CAPABILITY_COMPONENT_TYPES_EXT = 1000740000,
     XR_TYPE_SPATIAL_CONTEXT_CREATE_INFO_EXT = 1000740001,
     XR_TYPE_CREATE_SPATIAL_CONTEXT_COMPLETION_EXT = 1000740002,
@@ -1002,6 +1010,7 @@ typedef enum XrObjectType {
     XR_OBJECT_TYPE_FACE_TRACKER_ANDROID = 1000458000,
     XR_OBJECT_TYPE_WORLD_MESH_DETECTOR_ML = 1000474000,
     XR_OBJECT_TYPE_FACIAL_EXPRESSION_CLIENT_ML = 1000482000,
+    XR_OBJECT_TYPE_TRACKABLE_IMAGE_DATABASE_ANDROID = 1000709000,
     XR_OBJECT_TYPE_SPATIAL_ENTITY_EXT = 1000740000,
     XR_OBJECT_TYPE_SPATIAL_CONTEXT_EXT = 1000740001,
     XR_OBJECT_TYPE_SPATIAL_SNAPSHOT_EXT = 1000740002,
@@ -2192,7 +2201,7 @@ typedef struct XrBindingModificationsKHR {
 
 // XR_KHR_extended_struct_name_lengths is a preprocessor guard. Do not pass it to API calls.
 #define XR_KHR_extended_struct_name_lengths 1
-#define XR_KHR_extended_struct_name_lengths_SPEC_VERSION 1
+#define XR_KHR_extended_struct_name_lengths_SPEC_VERSION 2
 #define XR_KHR_EXTENDED_STRUCT_NAME_LENGTHS_EXTENSION_NAME "XR_KHR_extended_struct_name_lengths"
 #define XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR 256
 typedef XrResult (XRAPI_PTR *PFN_xrStructureTypeToString2KHR)(XrInstance instance, XrStructureType value, char buffer[XR_MAX_STRUCTURE_NAME_SIZE_EXTENDED_KHR]);
@@ -9483,6 +9492,7 @@ typedef enum XrTrackableTypeANDROID {
     XR_TRACKABLE_TYPE_DEPTH_ANDROID = 1000463000,
     XR_TRACKABLE_TYPE_OBJECT_ANDROID = 1000466000,
     XR_TRACKABLE_TYPE_MARKER_ANDROID = 1000707000,
+    XR_TRACKABLE_TYPE_IMAGE_ANDROID = 1000709000,
     XR_TRACKABLE_TYPE_MAX_ENUM_ANDROID = 0x7FFFFFFF
 } XrTrackableTypeANDROID;
 
@@ -10703,6 +10713,120 @@ XRAPI_ATTR XrResult XRAPI_CALL xrGetTrackableMarkerANDROID(
     XrTrackableTrackerANDROID                   tracker,
     const XrTrackableGetInfoANDROID*            getInfo,
     XrTrackableMarkerANDROID*                   markerOutput);
+#endif /* XR_EXTENSION_PROTOTYPES */
+#endif /* !XR_NO_PROTOTYPES */
+
+
+// XR_ANDROID_trackables_image is a preprocessor guard. Do not pass it to API calls.
+#define XR_ANDROID_trackables_image 1
+XR_DEFINE_HANDLE(XrTrackableImageDatabaseANDROID)
+#define XR_ANDROID_trackables_image_SPEC_VERSION 1
+#define XR_ANDROID_TRACKABLES_IMAGE_EXTENSION_NAME "XR_ANDROID_trackables_image"
+
+typedef enum XrTrackableImageTrackingModeANDROID {
+    XR_TRACKABLE_IMAGE_TRACKING_MODE_DYNAMIC_ANDROID = 1,
+    XR_TRACKABLE_IMAGE_TRACKING_MODE_STATIC_ANDROID = 2,
+    XR_TRACKABLE_IMAGE_TRACKING_MODE_MAX_ENUM_ANDROID = 0x7FFFFFFF
+} XrTrackableImageTrackingModeANDROID;
+
+typedef enum XrTrackableImageFormatANDROID {
+    XR_TRACKABLE_IMAGE_FORMAT_R8G8B8A8_ANDROID = 1,
+    XR_TRACKABLE_IMAGE_FORMAT_MAX_ENUM_ANDROID = 0x7FFFFFFF
+} XrTrackableImageFormatANDROID;
+// XrSystemImageTrackingPropertiesANDROID extends XrSystemProperties
+typedef struct XrSystemImageTrackingPropertiesANDROID {
+    XrStructureType       type;
+    void* XR_MAY_ALIAS    next;
+    XrBool32              supportsImageTracking;
+    XrBool32              supportsPhysicalSizeEstimation;
+    uint32_t              maxTrackedImageCount;
+    uint32_t              maxLoadedImageCount;
+} XrSystemImageTrackingPropertiesANDROID;
+
+typedef struct XrTrackableImageDatabaseEntryANDROID {
+    XrStructureType                        type;
+    const void* XR_MAY_ALIAS               next;
+    XrTrackableImageTrackingModeANDROID    trackingMode;
+    float                                  physicalWidth;
+    uint32_t                               imageWidth;
+    uint32_t                               imageHeight;
+    XrTrackableImageFormatANDROID          format;
+    uint32_t                               bufferSize;
+    const uint8_t*                         buffer;
+} XrTrackableImageDatabaseEntryANDROID;
+
+typedef struct XrTrackableImageDatabaseCreateInfoANDROID {
+    XrStructureType                                type;
+    const void* XR_MAY_ALIAS                       next;
+    uint32_t                                       entryCount;
+    const XrTrackableImageDatabaseEntryANDROID*    entries;
+} XrTrackableImageDatabaseCreateInfoANDROID;
+
+typedef struct XrCreateTrackableImageDatabaseCompletionANDROID {
+    XrStructureType                    type;
+    void* XR_MAY_ALIAS                 next;
+    XrResult                           futureResult;
+    XrTrackableImageDatabaseANDROID    database;
+} XrCreateTrackableImageDatabaseCompletionANDROID;
+
+typedef struct XrTrackableImageConfigurationANDROID {
+    XrStructureType                           type;
+    const void* XR_MAY_ALIAS                  next;
+    uint32_t                                  databaseCount;
+    const XrTrackableImageDatabaseANDROID*    databases;
+} XrTrackableImageConfigurationANDROID;
+
+typedef struct XrTrackableImageANDROID {
+    XrStructureType                    type;
+    const void* XR_MAY_ALIAS           next;
+    XrTrackingStateANDROID             trackingState;
+    XrTime                             lastUpdatedTime;
+    XrTrackableImageDatabaseANDROID    database;
+    uint32_t                           databaseEntryIndex;
+    XrPosef                            centerPose;
+    XrExtent2Df                        extents;
+} XrTrackableImageANDROID;
+
+typedef struct XrEventDataImageTrackingLostANDROID {
+    XrStructureType             type;
+    const void* XR_MAY_ALIAS    next;
+    XrTime                      time;
+} XrEventDataImageTrackingLostANDROID;
+
+typedef XrResult (XRAPI_PTR *PFN_xrCreateTrackableImageDatabaseAsyncANDROID)(XrSession session, const XrTrackableImageDatabaseCreateInfoANDROID* createInfo, XrFutureEXT* future);
+typedef XrResult (XRAPI_PTR *PFN_xrCreateTrackableImageDatabaseCompleteANDROID)(XrSession session, XrFutureEXT future, XrCreateTrackableImageDatabaseCompletionANDROID* completion);
+typedef XrResult (XRAPI_PTR *PFN_xrDestroyTrackableImageDatabaseANDROID)(XrTrackableImageDatabaseANDROID database);
+typedef XrResult (XRAPI_PTR *PFN_xrAddTrackableImageDatabaseANDROID)(XrTrackableTrackerANDROID tracker, XrTrackableImageDatabaseANDROID database);
+typedef XrResult (XRAPI_PTR *PFN_xrRemoveTrackableImageDatabaseANDROID)(XrTrackableTrackerANDROID tracker, XrTrackableImageDatabaseANDROID database);
+typedef XrResult (XRAPI_PTR *PFN_xrGetTrackableImageANDROID)(XrTrackableTrackerANDROID tracker, const XrTrackableGetInfoANDROID* getInfo, XrTrackableImageANDROID* trackable);
+
+#ifndef XR_NO_PROTOTYPES
+#ifdef XR_EXTENSION_PROTOTYPES
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateTrackableImageDatabaseAsyncANDROID(
+    XrSession                                   session,
+    const XrTrackableImageDatabaseCreateInfoANDROID* createInfo,
+    XrFutureEXT*                                future);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrCreateTrackableImageDatabaseCompleteANDROID(
+    XrSession                                   session,
+    XrFutureEXT                                 future,
+    XrCreateTrackableImageDatabaseCompletionANDROID* completion);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrDestroyTrackableImageDatabaseANDROID(
+    XrTrackableImageDatabaseANDROID             database);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrAddTrackableImageDatabaseANDROID(
+    XrTrackableTrackerANDROID                   tracker,
+    XrTrackableImageDatabaseANDROID             database);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrRemoveTrackableImageDatabaseANDROID(
+    XrTrackableTrackerANDROID                   tracker,
+    XrTrackableImageDatabaseANDROID             database);
+
+XRAPI_ATTR XrResult XRAPI_CALL xrGetTrackableImageANDROID(
+    XrTrackableTrackerANDROID                   tracker,
+    const XrTrackableGetInfoANDROID*            getInfo,
+    XrTrackableImageANDROID*                    trackable);
 #endif /* XR_EXTENSION_PROTOTYPES */
 #endif /* !XR_NO_PROTOTYPES */
 
