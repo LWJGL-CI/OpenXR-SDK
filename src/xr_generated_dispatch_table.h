@@ -840,6 +840,9 @@ struct XrGeneratedDispatchTable {
     PFN_xrCreateSpatialPersistenceContextCompleteEXT CreateSpatialPersistenceContextCompleteEXT;
     PFN_xrDestroySpatialPersistenceContextEXT DestroySpatialPersistenceContextEXT;
 
+    // ---- XR_EXT_haptic_parametric extension commands
+    PFN_xrHapticParametricGetPropertiesEXT HapticParametricGetPropertiesEXT;
+
     // ---- XR_EXT_spatial_persistence_operations extension commands
     PFN_xrPersistSpatialEntityAsyncEXT PersistSpatialEntityAsyncEXT;
     PFN_xrPersistSpatialEntityCompleteEXT PersistSpatialEntityCompleteEXT;

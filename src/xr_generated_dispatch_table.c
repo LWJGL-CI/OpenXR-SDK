@@ -834,6 +834,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrCreateSpatialPersistenceContextCompleteEXT", (PFN_xrVoidFunction*)&table->CreateSpatialPersistenceContextCompleteEXT));
     (get_inst_proc_addr(instance, "xrDestroySpatialPersistenceContextEXT", (PFN_xrVoidFunction*)&table->DestroySpatialPersistenceContextEXT));
 
+    // ---- XR_EXT_haptic_parametric extension commands
+    (get_inst_proc_addr(instance, "xrHapticParametricGetPropertiesEXT", (PFN_xrVoidFunction*)&table->HapticParametricGetPropertiesEXT));
+
     // ---- XR_EXT_spatial_persistence_operations extension commands
     (get_inst_proc_addr(instance, "xrPersistSpatialEntityAsyncEXT", (PFN_xrVoidFunction*)&table->PersistSpatialEntityAsyncEXT));
     (get_inst_proc_addr(instance, "xrPersistSpatialEntityCompleteEXT", (PFN_xrVoidFunction*)&table->PersistSpatialEntityCompleteEXT));
