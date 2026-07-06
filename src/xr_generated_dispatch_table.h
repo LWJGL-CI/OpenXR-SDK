@@ -636,6 +636,10 @@ struct XrGeneratedDispatchTable {
     PFN_xrCaptureSceneAsyncBD CaptureSceneAsyncBD;
     PFN_xrCaptureSceneCompleteBD CaptureSceneCompleteBD;
 
+    // ---- XR_BD_body_tracking_auxiliary_metrics extension commands
+    PFN_xrStartBodyTrackingCalibrationAppBD StartBodyTrackingCalibrationAppBD;
+    PFN_xrGetBodyTrackingStateBD GetBodyTrackingStateBD;
+
     // ---- XR_BD_spatial_audio_rendering extension commands
     PFN_xrEnumerateSupportedAudioSampleRateBD EnumerateSupportedAudioSampleRateBD;
     PFN_xrQueryFramesPerBufferRangeBD QueryFramesPerBufferRangeBD;
@@ -770,6 +774,9 @@ struct XrGeneratedDispatchTable {
     // ---- XR_META_tile_properties_hint extension commands
     PFN_xrSetTilePropertiesHintMETA SetTilePropertiesHintMETA;
 
+    // ---- XR_META_hand_tracking_frequency_hint extension commands
+    PFN_xrSetHandTrackingFrequencyHintMETA SetHandTrackingFrequencyHintMETA;
+
     // ---- XR_ANDROID_light_estimation extension commands
     PFN_xrCreateLightEstimatorANDROID CreateLightEstimatorANDROID;
     PFN_xrDestroyLightEstimatorANDROID DestroyLightEstimatorANDROID;
@@ -852,12 +859,29 @@ struct XrGeneratedDispatchTable {
     // ---- XR_ANDROID_spatial_discovery_raycast extension commands
     PFN_xrCreateSpatialRaycastSnapshotANDROID CreateSpatialRaycastSnapshotANDROID;
 
+    // ---- XR_ANDROID_google_cloud_auth extension commands
+    PFN_xrSetGoogleCloudAuthAsyncANDROID SetGoogleCloudAuthAsyncANDROID;
+    PFN_xrSetGoogleCloudAuthCompleteANDROID SetGoogleCloudAuthCompleteANDROID;
+
+    // ---- XR_ANDROID_geospatial extension commands
+    PFN_xrCreateGeospatialTrackerANDROID CreateGeospatialTrackerANDROID;
+    PFN_xrDestroyGeospatialTrackerANDROID DestroyGeospatialTrackerANDROID;
+    PFN_xrLocateGeospatialPoseFromPoseANDROID LocateGeospatialPoseFromPoseANDROID;
+    PFN_xrLocateGeospatialPoseANDROID LocateGeospatialPoseANDROID;
+    PFN_xrCheckVpsAvailabilityAsyncANDROID CheckVpsAvailabilityAsyncANDROID;
+    PFN_xrCheckVpsAvailabilityCompleteANDROID CheckVpsAvailabilityCompleteANDROID;
+
     // ---- XR_ANDROID_spatial_entity_bound_anchor extension commands
     PFN_xrEnumerateSpatialAnchorAttachableComponentsANDROID EnumerateSpatialAnchorAttachableComponentsANDROID;
 
     // ---- XR_ANDROID_spatial_anchor_space extension commands
     PFN_xrCreateSpatialAnchorSpaceANDROID CreateSpatialAnchorSpaceANDROID;
     PFN_xrCreateSpatialAnchorSpaceFromIdANDROID CreateSpatialAnchorSpaceFromIdANDROID;
+
+    // ---- XR_ANDROID_geospatial_anchor extension commands
+    PFN_xrCreateGeospatialAnchorANDROID CreateGeospatialAnchorANDROID;
+    PFN_xrCreateSurfaceAnchorAsyncANDROID CreateSurfaceAnchorAsyncANDROID;
+    PFN_xrCreateSurfaceAnchorCompleteANDROID CreateSurfaceAnchorCompleteANDROID;
 };
 
 

@@ -630,6 +630,10 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     (get_inst_proc_addr(instance, "xrCaptureSceneAsyncBD", (PFN_xrVoidFunction*)&table->CaptureSceneAsyncBD));
     (get_inst_proc_addr(instance, "xrCaptureSceneCompleteBD", (PFN_xrVoidFunction*)&table->CaptureSceneCompleteBD));
 
+    // ---- XR_BD_body_tracking_auxiliary_metrics extension commands
+    (get_inst_proc_addr(instance, "xrStartBodyTrackingCalibrationAppBD", (PFN_xrVoidFunction*)&table->StartBodyTrackingCalibrationAppBD));
+    (get_inst_proc_addr(instance, "xrGetBodyTrackingStateBD", (PFN_xrVoidFunction*)&table->GetBodyTrackingStateBD));
+
     // ---- XR_BD_spatial_audio_rendering extension commands
     (get_inst_proc_addr(instance, "xrEnumerateSupportedAudioSampleRateBD", (PFN_xrVoidFunction*)&table->EnumerateSupportedAudioSampleRateBD));
     (get_inst_proc_addr(instance, "xrQueryFramesPerBufferRangeBD", (PFN_xrVoidFunction*)&table->QueryFramesPerBufferRangeBD));
@@ -764,6 +768,9 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     // ---- XR_META_tile_properties_hint extension commands
     (get_inst_proc_addr(instance, "xrSetTilePropertiesHintMETA", (PFN_xrVoidFunction*)&table->SetTilePropertiesHintMETA));
 
+    // ---- XR_META_hand_tracking_frequency_hint extension commands
+    (get_inst_proc_addr(instance, "xrSetHandTrackingFrequencyHintMETA", (PFN_xrVoidFunction*)&table->SetHandTrackingFrequencyHintMETA));
+
     // ---- XR_ANDROID_light_estimation extension commands
     (get_inst_proc_addr(instance, "xrCreateLightEstimatorANDROID", (PFN_xrVoidFunction*)&table->CreateLightEstimatorANDROID));
     (get_inst_proc_addr(instance, "xrDestroyLightEstimatorANDROID", (PFN_xrVoidFunction*)&table->DestroyLightEstimatorANDROID));
@@ -846,12 +853,29 @@ void GeneratedXrPopulateDispatchTable(struct XrGeneratedDispatchTable *table,
     // ---- XR_ANDROID_spatial_discovery_raycast extension commands
     (get_inst_proc_addr(instance, "xrCreateSpatialRaycastSnapshotANDROID", (PFN_xrVoidFunction*)&table->CreateSpatialRaycastSnapshotANDROID));
 
+    // ---- XR_ANDROID_google_cloud_auth extension commands
+    (get_inst_proc_addr(instance, "xrSetGoogleCloudAuthAsyncANDROID", (PFN_xrVoidFunction*)&table->SetGoogleCloudAuthAsyncANDROID));
+    (get_inst_proc_addr(instance, "xrSetGoogleCloudAuthCompleteANDROID", (PFN_xrVoidFunction*)&table->SetGoogleCloudAuthCompleteANDROID));
+
+    // ---- XR_ANDROID_geospatial extension commands
+    (get_inst_proc_addr(instance, "xrCreateGeospatialTrackerANDROID", (PFN_xrVoidFunction*)&table->CreateGeospatialTrackerANDROID));
+    (get_inst_proc_addr(instance, "xrDestroyGeospatialTrackerANDROID", (PFN_xrVoidFunction*)&table->DestroyGeospatialTrackerANDROID));
+    (get_inst_proc_addr(instance, "xrLocateGeospatialPoseFromPoseANDROID", (PFN_xrVoidFunction*)&table->LocateGeospatialPoseFromPoseANDROID));
+    (get_inst_proc_addr(instance, "xrLocateGeospatialPoseANDROID", (PFN_xrVoidFunction*)&table->LocateGeospatialPoseANDROID));
+    (get_inst_proc_addr(instance, "xrCheckVpsAvailabilityAsyncANDROID", (PFN_xrVoidFunction*)&table->CheckVpsAvailabilityAsyncANDROID));
+    (get_inst_proc_addr(instance, "xrCheckVpsAvailabilityCompleteANDROID", (PFN_xrVoidFunction*)&table->CheckVpsAvailabilityCompleteANDROID));
+
     // ---- XR_ANDROID_spatial_entity_bound_anchor extension commands
     (get_inst_proc_addr(instance, "xrEnumerateSpatialAnchorAttachableComponentsANDROID", (PFN_xrVoidFunction*)&table->EnumerateSpatialAnchorAttachableComponentsANDROID));
 
     // ---- XR_ANDROID_spatial_anchor_space extension commands
     (get_inst_proc_addr(instance, "xrCreateSpatialAnchorSpaceANDROID", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorSpaceANDROID));
     (get_inst_proc_addr(instance, "xrCreateSpatialAnchorSpaceFromIdANDROID", (PFN_xrVoidFunction*)&table->CreateSpatialAnchorSpaceFromIdANDROID));
+
+    // ---- XR_ANDROID_geospatial_anchor extension commands
+    (get_inst_proc_addr(instance, "xrCreateGeospatialAnchorANDROID", (PFN_xrVoidFunction*)&table->CreateGeospatialAnchorANDROID));
+    (get_inst_proc_addr(instance, "xrCreateSurfaceAnchorAsyncANDROID", (PFN_xrVoidFunction*)&table->CreateSurfaceAnchorAsyncANDROID));
+    (get_inst_proc_addr(instance, "xrCreateSurfaceAnchorCompleteANDROID", (PFN_xrVoidFunction*)&table->CreateSurfaceAnchorCompleteANDROID));
 }
 
 
